@@ -40,6 +40,15 @@ func (app *appEnv) fromArgs(args []string) error {
 
 	app.stanConn = sc
 
+	err = faker.SetRandomMapAndSliceMinSize(1)
+	if err != nil {
+		return err
+	}
+	err = faker.SetRandomMapAndSliceSize(5)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
