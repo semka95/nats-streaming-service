@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:14.3-alpine
+    env_file:
+      - ./db.env
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  nats-streaming:
+    image: nats-streaming:0.24.6
+    container_name: nats_streaming
+    ports:
+     - "4222:4222"
+     - "8222:8222"
+
+
+volumes:
+  db:
+    driver: local
