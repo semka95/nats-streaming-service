@@ -68,13 +68,12 @@ func main() {
 		logger.Fatal("cat't connect to stan", zap.Error(err))
 	}
 
-	sub, err := sc.Subscribe("orders", func(msg *stan.Msg) {
-		err := insertMessage(msg.Data, store)
+	_, err = sc.Subscribe("orders", func(msg *stan.Msg) {
+		err := insertMessage(msg.Data, store, c)
 		if err != nil {
-			logger.Info("can't create order", zap.Error(err))
+			logger.Info("can't store order", zap.Error(err))
 		}
-		msg.Ack()
-	}, stan.DeliverAllAvailable(), stan.SetManualAckMode(), stan.AckWait(time.Second))
+	}, stan.DeliverAllAvailable(), stan.DurableName(config.DurableName))
 
 	if err != nil {
 		logger.Fatal("cat't subscribe to channel", zap.Error(err))

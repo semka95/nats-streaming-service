@@ -15,6 +15,10 @@ type Config struct {
 	IdleTimeout       int    `env:"IDLE_TIMEOUT,default=30"`
 	ShutdownTimeout   int    `env:"SHUTDOWN_TIMEOUT,default=10"`
 	CacheSize         int    `env:"CACHE_SIZE,default=1024"`
+	NatsURL           string `env:"NATS_URL,default=nats://127.0.0.1:4222"`
+	ClusterID         string `env:"CLUSTER_ID,default=test-cluster"`
+	ClientID          string `env:"CLIENT_ID,default=client-456"`
+	DurableName       string `env:"DURABLE_NAME,default=my-durable"`
 }
 
 // NewConfig reads config from env and creates config struct
