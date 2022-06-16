@@ -1,11 +1,14 @@
 -- name: CreateOrder :exec
-INSERT INTO orders(
-    data
-) VALUES (
-    $1
-);
+INSERT INTO orders(order_uid, data) 
+VALUES ($1, $2);
 
 -- name: GetOrderByID :one
-SELECT data 
+SELECT order_uid, data
 FROM orders
-WHERE data ->> 'order_uid' = $1;
+WHERE order_uid = $1;
+
+-- name: ListOrders :many
+SELECT order_uid, data
+FROM orders
+WHERE id > $1
+LIMIT $2;

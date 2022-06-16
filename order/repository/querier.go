@@ -6,12 +6,12 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 )
 
 type Querier interface {
-	CreateOrder(ctx context.Context, data json.RawMessage) error
-	GetOrderByID(ctx context.Context, data json.RawMessage) (json.RawMessage, error)
+	CreateOrder(ctx context.Context, arg CreateOrderParams) error
+	GetOrderByID(ctx context.Context, orderUid string) (GetOrderByIDRow, error)
+	ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListOrdersRow, error)
 }
 
 var _ Querier = (*Queries)(nil)
