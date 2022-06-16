@@ -14,6 +14,7 @@ import (
 	"github.com/nats-io/stan.go"
 	"go.uber.org/zap"
 
+	"l0/cache"
 	"l0/order"
 	orderAPI "l0/order/api"
 	orderStore "l0/order/repository"
@@ -49,7 +50,20 @@ func main() {
 
 	store := orderStore.New(db)
 
-	sc, err := stan.Connect("test-cluster", "client-456", stan.NatsURL("nats://127.0.0.1:4222"), stan.MaxPubAcksInflight(1000))
+	logger.Info("recovering cache")
+	c, err := cache.NewCache(config.CacheSize, store, logger)
+	if err != nil {
+		logger.Warn("can't create cache", zap.Error(err))
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.ShutdownTimeout)*time.Second)
+	defer cancel()
+	err = c.Recover(ctx)
+	if err != nil {
+		logger.Warn("can't recover cache", zap.Error(err))
+	}
+
+	logger.Info("connecting to stan")
+	sc, err := stan.Connect(config.ClusterID, config.ClientID, stan.NatsURL(config.NatsURL), stan.MaxPubAcksInflight(1000))
 	if err != nil {
 		logger.Fatal("cat't connect to stan", zap.Error(err))
 	}
@@ -68,7 +82,7 @@ func main() {
 
 	// init router
 	api := orderAPI.API{}
-	router := api.NewRouter(store)
+	router := api.NewRouter(store, c)
 
 	// init http server
 	srv := &http.Server{
@@ -99,17 +113,23 @@ func main() {
 	}
 }
 
-func insertMessage(data []byte, store *orderStore.Queries) error {
+func insertMessage(data []byte, store *orderStore.Queries, cache *cache.Cache) error {
 	o := new(order.Order)
 	err := json.Unmarshal(data, o)
 	if err != nil {
 		return err
 	}
 
-	err = store.CreateOrder(context.Background(), data)
+	params := orderStore.CreateOrderParams{
+		OrderUid: o.OrderUID,
+		Data:     data,
+	}
+
+	err = store.CreateOrder(context.Background(), params)
 	if err != nil {
 		return err
 	}
+	cache.Store(o.OrderUID, data)
 
 	return nil
 }

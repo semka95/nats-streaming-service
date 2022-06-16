@@ -6,6 +6,7 @@ require (
 	github.com/bxcodec/faker/v3 v3.8.0
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.1
+	github.com/hashicorp/golang-lru v0.5.4
 	github.com/lib/pq v1.10.6
 	github.com/nats-io/stan.go v0.10.2
 	github.com/sethvargo/go-envconfig v0.7.0

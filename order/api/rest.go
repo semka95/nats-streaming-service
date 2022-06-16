@@ -1,22 +1,25 @@
 package api
 
 import (
-	"database/sql"
-	"encoding/json"
 	"errors"
+	"fmt"
 	"l0/order/repository"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+
+	"l0/cache"
 )
 
 type API struct {
 	orderStore repository.Querier
+	cache      *cache.Cache
 }
 
-func (a *API) NewRouter(orderStore repository.Querier) chi.Router {
+func (a *API) NewRouter(orderStore repository.Querier, cache *cache.Cache) chi.Router {
 	a.orderStore = orderStore
+	a.cache = cache
 
 	r := chi.NewRouter()
 	r.Get("/order/{id}", a.getOrderByID)
@@ -32,13 +35,13 @@ func (a *API) getOrderByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	order, err := a.orderStore.GetOrderByID(r.Context(), json.RawMessage(id))
-	if errors.Is(err, sql.ErrNoRows) {
-		SendErrorJSON(w, r, http.StatusNotFound, err, "payment not found")
+	order, ok, err := a.cache.Get(r.Context(), id)
+	if err != nil {
+		SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't get order")
 		return
 	}
-	if err != nil {
-		SendErrorJSON(w, r, http.StatusInternalServerError, err, "can't get payment")
+	if !ok {
+		SendErrorJSON(w, r, http.StatusNotFound, fmt.Errorf("order %s not found", id), "order not found")
 		return
 	}
 

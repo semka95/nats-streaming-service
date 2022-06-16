@@ -14,6 +14,7 @@ type Config struct {
 	ReadTimeout       int    `env:"READ_TIMEOUT,default=5"`
 	IdleTimeout       int    `env:"IDLE_TIMEOUT,default=30"`
 	ShutdownTimeout   int    `env:"SHUTDOWN_TIMEOUT,default=10"`
+	CacheSize         int    `env:"CACHE_SIZE,default=1024"`
 }
 
 // NewConfig reads config from env and creates config struct
