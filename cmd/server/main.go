@@ -79,11 +79,9 @@ func main() {
 		logger.Fatal("cat't subscribe to channel", zap.Error(err))
 	}
 
-	// init router
 	api := orderAPI.API{}
 	router := api.NewRouter(store, c)
 
-	// init http server
 	srv := &http.Server{
 		Addr:        config.HTTPServerAddress,
 		Handler:     router,
@@ -91,7 +89,7 @@ func main() {
 		IdleTimeout: time.Duration(config.IdleTimeout) * time.Second,
 	}
 
-	// run server
+	logger.Info("running http server")
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal("can't start server", zap.Error(err), zap.String("server address", config.HTTPServerAddress))
@@ -102,8 +100,7 @@ func main() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 	<-stop
-	logger.Info("received an interrupt, unsubscribing and closing connection")
-	sub.Unsubscribe()
+	logger.Info("received an interrupt, closing stan connection and stopping server")
 	sc.Close()
 	timeout, cancel := context.WithTimeout(context.Background(), time.Duration(config.ShutdownTimeout)*time.Second)
 	defer cancel()
