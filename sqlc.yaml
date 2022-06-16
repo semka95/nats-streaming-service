@@ -1,0 +1,9 @@
+version: 1
+packages:
+  - path: "./order/repository/"
+    name: "repository"
+    engine: "postgresql"
+    schema: "./schema.sql"
+    queries: "./order/repository/queries.sql"
+    emit_json_tags: true
+    emit_interface: true
