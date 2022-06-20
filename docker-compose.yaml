@@ -17,6 +17,16 @@ services:
      - "4222:4222"
      - "8222:8222"
 
+  backend:
+    build: .
+    container_name: order_api
+    env_file:
+      - ./app.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - nats_streaming
 
 volumes:
   db:
