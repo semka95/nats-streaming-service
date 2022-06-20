@@ -69,7 +69,7 @@ func main() {
 	}
 
 	_, err = sc.Subscribe("orders", func(msg *stan.Msg) {
-		err := insertMessage(msg.Data, store, c)
+		err = insertMessage(msg.Data, store, c)
 		if err != nil {
 			logger.Info("can't store order", zap.Error(err))
 		}
@@ -109,7 +109,7 @@ func main() {
 	}
 }
 
-func insertMessage(data []byte, store *orderStore.Queries, cache *cache.Cache) error {
+func insertMessage(data []byte, store *orderStore.Queries, c *cache.Cache) error {
 	o := new(order.Order)
 	err := json.Unmarshal(data, o)
 	if err != nil {
@@ -125,7 +125,7 @@ func insertMessage(data []byte, store *orderStore.Queries, cache *cache.Cache) e
 	if err != nil {
 		return err
 	}
-	cache.Store(o.OrderUID, data)
+	c.Store(o.OrderUID, data)
 
 	return nil
 }

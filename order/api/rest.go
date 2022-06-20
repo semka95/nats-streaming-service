@@ -22,9 +22,9 @@ type API struct {
 	tmpl       *template.Template
 }
 
-func (a *API) NewRouter(orderStore repository.Querier, cache *cache.Cache) chi.Router {
+func (a *API) NewRouter(orderStore repository.Querier, c *cache.Cache) chi.Router {
 	a.orderStore = orderStore
-	a.cache = cache
+	a.cache = c
 
 	workDir, _ := os.Getwd()
 	a.tmpl = template.Must(template.ParseFiles(filepath.Join(workDir, "static", "templates", "index.gohtml"), filepath.Join(workDir, "static", "templates", "order.gohtml")))

@@ -88,8 +88,6 @@ func (app *appEnv) run() {
 			return
 		}
 	}
-
-	return
 }
 
 func cli(args []string) int {
