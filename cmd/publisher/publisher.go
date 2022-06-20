@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"time"
@@ -64,6 +65,11 @@ func (app *appEnv) publishMessage() {
 		log.Printf("error marshaling message %s", err.Error())
 	}
 
+	if rand.Float64() > 0.9 {
+		b = []byte("bad data")
+		o.OrderUID = "bad data"
+	}
+
 	err = app.stanConn.Publish("orders", b)
 	if err != nil {
 		log.Printf("error publishing message %s", err.Error())
@@ -104,5 +110,6 @@ func cli(args []string) int {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	os.Exit(cli(os.Args[1:]))
 }
