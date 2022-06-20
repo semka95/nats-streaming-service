@@ -1,0 +1,16 @@
+{{define "order"}}
+{{if .Success}}
+<div class="order">
+  <pre id="order"><code id="json">{{.Order}}</code></pre>
+  <script>
+    let data = document.getElementById("json").textContent;
+    let result = JSON.parse(data);
+    let textedJson = JSON.stringify(result, undefined, 4);
+    document.getElementById("json").textContent = textedJson;
+  </script>
+</div>
+{{ end }}
+{{if .Err}}
+{{.ErrMsg}}
+{{ end }}
+{{ end }}

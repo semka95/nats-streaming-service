@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wildberries L0</title>
+    <link rel="stylesheet" href="/static/main.css" />
+  </head>
+  <body>
+    <div class="container">
+      <form method="post" action="/order" class="form">
+        <label for="order_uid">Input Order UID</label>
+        <input type="text" name="order_uid" id="order_uid" />
+        <input type="submit" value="Find" />
+      </form>
+      {{template "order" .}}
+    </div>
+  </body>
+</html>
